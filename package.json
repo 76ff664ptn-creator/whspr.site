@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "js-cookie": "^3.0.5",
+    "mongoose": "^9.6.2",
     "next": "16.2.6",
+    "node-cron": "^4.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

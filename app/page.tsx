@@ -1,65 +1,359 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+
+import Image from 'next/image';
+
+import UsernameForm from '@/components/UsernameForm';
+
+import PostForm from '@/components/PostForm';
+
+import PostList from '@/components/PostList';
+
+import Search from '@/components/Search';
 
 export default function Home() {
+
+  const [username, setUsername] = useState('');
+
+  const [sessionId, setSessionId] = useState('');
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const [usernameError, setUsernameError] = useState('');
+
+  const [showSearch, setShowSearch] = useState(false);
+
+  const [replyTarget, setReplyTarget] = useState<{ postId: string; author: string } | null>(null);
+
+  const heartbeatInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const cleanupInterval = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+
+    const storedUsername = sessionStorage.getItem('username');
+
+    const storedSessionId = sessionStorage.getItem('sessionId');
+
+    if (storedUsername && storedSessionId) {
+
+      // Verify session is still valid
+
+      verifySession(storedUsername, storedSessionId);
+
+    }
+
+    // Start cleanup interval
+
+    cleanupInterval.current = setInterval(async () => {
+
+      try {
+
+        await fetch('/api/auth/cleanup', {
+
+          method: 'POST',
+
+        });
+
+      } catch (error) {
+
+        console.error('Cleanup failed:', error);
+
+      }
+
+    }, 2 * 60 * 1000); // Clean up every 2 minutes
+
+  }, []);
+
+  const verifySession = async (u: string, sId: string) => {
+
+    try {
+
+      const res = await fetch('/api/auth/heartbeat', {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({ sessionId: sId }),
+
+      });
+
+      if (res.ok) {
+
+        setUsername(u);
+
+        setSessionId(sId);
+
+        startHeartbeat(sId);
+
+      } else {
+
+        // Session invalid, clear storage
+
+        sessionStorage.removeItem('username');
+
+        sessionStorage.removeItem('sessionId');
+
+      }
+
+    } catch (error) {
+
+      console.error('Session verification failed:', error);
+
+      sessionStorage.removeItem('username');
+
+      sessionStorage.removeItem('sessionId');
+
+    }
+
+  };
+
+  const startHeartbeat = (sId: string) => {
+
+    if (heartbeatInterval.current) {
+
+      clearInterval(heartbeatInterval.current);
+
+    }
+
+    heartbeatInterval.current = setInterval(async () => {
+
+      try {
+
+        await fetch('/api/auth/heartbeat', {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify({ sessionId: sId }),
+
+        });
+
+      } catch (error) {
+
+        console.error('Heartbeat failed:', error);
+
+      }
+
+    }, 60000); // Ping every minute
+
+  };
+
+  const handleSetUsername = async (u: string) => {
+
+    try {
+
+      setUsernameError('');
+
+      const res = await fetch('/api/auth/username', {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({ username: u }),
+
+      });
+
+      if (res.ok) {
+
+        const data = await res.json();
+
+        sessionStorage.setItem('username', data.username);
+
+        sessionStorage.setItem('sessionId', data.sessionId);
+
+        setUsername(data.username);
+
+        setSessionId(data.sessionId);
+
+        startHeartbeat(data.sessionId);
+
+      } else {
+
+        const error = await res.json();
+
+        setUsernameError(error.error);
+
+      }
+
+    } catch (error) {
+
+      console.error('Failed to set username:', error);
+
+      setUsernameError('Failed to set username');
+
+    }
+
+  };
+
+  const handleLogout = () => {
+
+    if (heartbeatInterval.current) {
+
+      clearInterval(heartbeatInterval.current);
+
+    }
+
+    sessionStorage.removeItem('username');
+
+    sessionStorage.removeItem('sessionId');
+
+    setUsername('');
+
+    setSessionId('');
+
+    setReplyTarget(null);
+
+  };
+
+  const refreshFeed = () => {
+
+    setRefreshKey((prev) => prev + 1);
+
+  };
+
+  const handleReplyClick = (postId: string, author: string) => {
+
+    setReplyTarget({ postId, author });
+
+    setShowSearch(false);
+
+    setTimeout(() => {
+
+      document.getElementById('post-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    }, 150);
+
+  };
+
+  // Cleanup on unmount
+
+  useEffect(() => {
+
+    return () => {
+
+      if (heartbeatInterval.current) {
+
+        clearInterval(heartbeatInterval.current);
+
+      }
+
+      if (cleanupInterval.current) {
+
+        clearInterval(cleanupInterval.current);
+
+      }
+
+    };
+
+  }, []);
+
+  if (!username) {
+
+    return <UsernameForm onSet={handleSetUsername} error={usernameError} />;
+
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+    <div className="min-h-screen bg-slate-900 text-slate-100">
+
+      <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-4 py-5">
+
+        <header className="mb-4 rounded-3xl bg-slate-800/80 p-4 shadow-lg shadow-black/20 backdrop-blur">
+
+          <div className="flex items-center justify-between">
+
+            <button
+
+              onClick={() => {
+
+                if (confirm('Are you sure you want to end your session? Your posts will be deleted.')) {
+
+                  handleLogout();
+
+                  window.location.reload();
+
+                }
+
+              }}
+
+              aria-label="End session"
+
+              className="inline-flex items-center justify-center rounded-full p-2 transition hover:bg-slate-700"
+
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+              ✕
+
+            </button>
+
+            <button
+
+              onClick={refreshFeed}
+
+              aria-label="Refresh feed"
+
+              className="inline-flex items-center justify-center rounded-full p-2 transition hover:bg-slate-700"
+
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+              <Image src="/logo.png" alt="Whspr logo" width={40} height={40} className="rounded-full" />
+
+            </button>
+
+            <button
+
+              onClick={() => setShowSearch((prev) => !prev)}
+
+              aria-label="Toggle search"
+
+              className="inline-flex items-center justify-center rounded-full p-2 transition hover:bg-slate-700"
+
+            >
+
+              🔍
+
+            </button>
+
+          </div>
+
+        </header>
+
+        {showSearch && (
+
+          <div className="mb-4 rounded-3xl bg-slate-800/90 p-4 shadow-inner shadow-black/10">
+
+            <Search />
+
+          </div>
+
+        )}
+
+        <main className="flex-1 space-y-4">
+
+          <section className="space-y-4">
+
+            <PostList username={username} refreshKey={refreshKey} onReplyClick={handleReplyClick} />
+
+          </section>
+
+        </main>
+
+        <footer className="mt-4 rounded-3xl bg-slate-800/90 p-4 shadow-lg shadow-black/20 backdrop-blur">
+
+          <PostForm username={username} onPost={refreshFeed} replyTarget={replyTarget} setReplyTarget={setReplyTarget} />
+
+        </footer>
+
+      </div>
+
     </div>
+
   );
+
 }
