@@ -6,7 +6,7 @@ interface TutorialProps {
 
 export default function Tutorial({ onComplete }: TutorialProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4 py-8">
       <div className="bg-slate-800 rounded-3xl shadow-xl shadow-black/40 max-w-2xl w-full p-8 border border-slate-700/50 max-h-[90vh] overflow-y-auto">
         <h2 className="text-3xl font-semibold mb-8 text-center">Welcome to whspr</h2>
         

@@ -288,11 +288,15 @@ export default function Home() {
 
   }
 
+  if (showTutorial) {
+
+    return <Tutorial onComplete={() => setShowTutorial(false)} />;
+
+  }
+
   return (
 
     <div className="min-h-screen bg-slate-900 text-slate-100">
-
-      {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
 
       <div className="fixed top-0 left-0 right-0 bg-slate-900 z-50 backdrop-blur">
 
