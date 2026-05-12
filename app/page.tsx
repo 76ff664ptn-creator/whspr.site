@@ -10,6 +10,8 @@ import PostForm from '@/components/PostForm';
 
 import PostList from '@/components/PostList';
 
+import Tutorial from '@/components/Tutorial';
+
 export default function Home() {
 
   const [username, setUsername] = useState('');
@@ -25,6 +27,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [replyTarget, setReplyTarget] = useState<{ postId: string; author: string } | null>(null);
+
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const heartbeatInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -170,6 +174,8 @@ export default function Home() {
 
         setSessionId(data.sessionId);
 
+        setShowTutorial(true);
+
         startHeartbeat(data.sessionId);
 
       } else {
@@ -285,6 +291,8 @@ export default function Home() {
   return (
 
     <div className="min-h-screen bg-slate-900 text-slate-100">
+
+      {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
 
       <div className="fixed top-0 left-0 right-0 bg-slate-900 z-50 backdrop-blur">
 

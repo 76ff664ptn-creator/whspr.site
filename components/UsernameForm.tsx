@@ -82,7 +82,9 @@ export default function UsernameForm({ onSet, error }: Props) {
 
         />
 
-        <button onClick={handleSubmit} onTouchStart={handleSubmit} className="bg-blue-500 text-white p-4 rounded-3xl w-full hover:bg-blue-600 transition">Enter</button>
+        <button onClick={handleSubmit} onTouchStart={handleSubmit} className="bg-blue-500 text-white p-4 rounded-3xl w-full hover:bg-blue-600 transition mb-4">Enter</button>
+
+        <p className="text-xs text-slate-400 italic text-center">We need access to your location for post recommendation <span className="font-semibold">*only*</span>, we have a strict <span className="font-semibold">*no logs*</span> policy</p>
 
       </div>
 
