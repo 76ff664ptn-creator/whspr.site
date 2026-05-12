@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   lastActivity: { type: Date, default: Date.now },
-  sessionId: { type: String, required: true, unique: true }
+  sessionId: { type: String, required: true, unique: true },
+  locked: { type: Boolean, default: false }
 });
 
 UserSchema.index({ lastActivity: 1 });

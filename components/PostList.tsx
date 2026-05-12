@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import PostItem from './PostItem';
 
@@ -20,6 +20,8 @@ interface Post {
 
   proximityScore: number;
 
+  locked: boolean;
+
 }
 
 interface Props {
@@ -30,29 +32,15 @@ interface Props {
 
   onReplyClick: (postId: string, author: string) => void;
 
+  searchQuery?: string;
+
 }
 
-export default function PostList({ username, refreshKey, onReplyClick }: Props) {
+export default function PostList({ username, refreshKey, onReplyClick, searchQuery = '' }: Props) {
 
   const [posts, setPosts] = useState<Post[]>([]);
 
   const [location, setLocation] = useState<{ lon: number; lat: number } | null>(null);
-
-  useEffect(() => {
-
-    getLocation();
-
-  }, []);
-
-  useEffect(() => {
-
-    if (location) {
-
-      fetchPosts();
-
-    }
-
-  }, [location, refreshKey]);
 
   const getLocation = () => {
 
@@ -84,7 +72,7 @@ export default function PostList({ username, refreshKey, onReplyClick }: Props) 
 
   };
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
 
     if (!location) return;
 
@@ -124,13 +112,35 @@ export default function PostList({ username, refreshKey, onReplyClick }: Props) 
 
     }
 
-  };
+  }, [location]);
+
+  useEffect(() => {
+
+    getLocation();
+
+  }, []);
+
+  useEffect(() => {
+
+    if (location) {
+
+      fetchPosts();
+
+    }
+
+  }, [location, refreshKey, fetchPosts]);
+
+  const filteredPosts = posts.filter(post =>
+
+    searchQuery === '' || post.text.toLowerCase().includes(searchQuery.toLowerCase()) || post.author.toLowerCase().includes(searchQuery.toLowerCase())
+
+  );
 
   return (
 
     <div>
 
-      {posts.map((post) => (
+      {filteredPosts.map((post) => (
 
         <PostItem key={post._id} post={post} username={username} onUpdate={fetchPosts} onReplyClick={onReplyClick} />
 

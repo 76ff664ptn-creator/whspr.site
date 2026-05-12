@@ -20,6 +20,14 @@ export async function POST(request: NextRequest) {
 
     const trimmedUsername = username.trim();
 
+    // Reserve the whspr username for locked posts
+
+    if (trimmedUsername.toLowerCase() === 'whspr') {
+
+      return NextResponse.json({ error: 'Username not available' }, { status: 409 });
+
+    }
+
     // Check if username is already taken
 
     const existingUser = await User.findOne({ username: trimmedUsername });

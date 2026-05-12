@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
-    const inactiveUsers = await User.find({ lastActivity: { $lt: fiveMinutesAgo } });
+    const inactiveUsers = await User.find({ lastActivity: { $lt: fiveMinutesAgo }, locked: false });
 
     const inactiveUsernames = inactiveUsers.map(user => user.username);
 
@@ -25,10 +25,18 @@ export async function POST(request: NextRequest) {
     // Delete all posts by inactive users
 
     if (inactiveUsernames.length > 0) {
+      const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
       // Find all posts by inactive users
 
-      postsToDelete = await Post.find({ author: { $in: inactiveUsernames } });
+      postsToDelete = await Post.find({
+        author: { $in: inactiveUsernames },
+        $or: [
+          { locked: { $exists: false } },
+          { locked: false },
+          { lastInteraction: { $lt: fortyEightHoursAgo } }
+        ]
+      });
 
       // Delete posts and their replies recursively
 

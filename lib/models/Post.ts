@@ -15,6 +15,7 @@ const PostSchema = new mongoose.Schema({
   repliesCount: { type: Number, default: 0 },
   likesCount: { type: Number, default: 0 },
   heat: { type: Number, default: 0 },
+  locked: { type: Boolean, default: false },
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], default: [0, 0] }

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+import Image from 'next/image';
+
 interface Props {
 
   onSet: (u: string) => void;
@@ -48,13 +50,19 @@ export default function UsernameForm({ onSet, error }: Props) {
 
   return (
 
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4">
 
-      <div className="bg-white p-6 rounded shadow-md">
+      <div className="bg-slate-800 p-6 rounded-3xl shadow-lg shadow-black/20 backdrop-blur max-w-md w-full">
 
-        <h2 className="text-xl mb-4">Enter your username</h2>
+        <div className="flex justify-center mb-6">
 
-        {localError && <p className="text-red-500 mb-4">{localError}</p>}
+          <Image src="/logo.png" alt="Whspr logo" width={120} height={120} className="rounded-full" />
+
+        </div>
+
+        <h2 className="text-xl mb-4 text-center">Enter your username</h2>
+
+        {localError && <p className="text-red-500 mb-4 text-center">{localError}</p>}
 
         <input
 
@@ -66,7 +74,7 @@ export default function UsernameForm({ onSet, error }: Props) {
 
           placeholder="Username"
 
-          className="border p-2 w-full mb-4"
+          className="border-0 bg-slate-700 text-slate-100 p-4 rounded-3xl w-full mb-4 outline-none"
 
           autoFocus
 
@@ -74,7 +82,7 @@ export default function UsernameForm({ onSet, error }: Props) {
 
         />
 
-        <button onClick={handleSubmit} onTouchStart={handleSubmit} className="bg-blue-500 text-white p-2 w-full">Enter</button>
+        <button onClick={handleSubmit} onTouchStart={handleSubmit} className="bg-blue-500 text-white p-4 rounded-3xl w-full hover:bg-blue-600 transition">Enter</button>
 
       </div>
 

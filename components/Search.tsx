@@ -18,6 +18,8 @@ interface Post {
 
   proximityScore: number;
 
+  locked: boolean;
+
 }
 
 export default function Search() {

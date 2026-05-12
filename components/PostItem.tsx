@@ -22,6 +22,8 @@ interface Post {
 
   proximityScore: number;
 
+  locked: boolean;
+
 }
 
 interface Props {
@@ -41,6 +43,7 @@ export default function PostItem({ post, username, onUpdate, onReplyClick }: Pro
   const [showChildren, setShowChildren] = useState(true);
 
   const liked = (post.likes || []).some((like) => like.username === username);
+  const locked = Boolean(post.locked);
 
   const handleLike = async (e: MouseEvent<HTMLButtonElement>) => {
 
@@ -80,6 +83,44 @@ export default function PostItem({ post, username, onUpdate, onReplyClick }: Pro
 
   };
 
+  const handleToggleLock = async (e: MouseEvent<HTMLButtonElement>) => {
+
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    try {
+
+      const res = await fetch(`/api/posts/${post._id}/lock`, {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({ username, lock: !locked }),
+
+      });
+
+      if (res.ok) {
+
+        onUpdate();
+
+      } else {
+
+        const errorText = await res.text();
+
+        console.error('Lock toggle request failed', res.status, errorText);
+
+      }
+
+    } catch (error) {
+
+      console.error('Lock toggle request error', error);
+
+    }
+
+  };
+
   return (
 
     <div className="border p-4 mb-4 bg-slate-800 rounded-lg hover:bg-slate-750 transition">
@@ -90,7 +131,7 @@ export default function PostItem({ post, username, onUpdate, onReplyClick }: Pro
 
           <p className="text-slate-100">
 
-            <span className="text-slate-200/90 font-semibold block">{post.author}</span>
+            <span className={post.author === 'whspr' ? 'text-slate-400 italic block' : 'text-slate-200/90 font-semibold block'}>{post.author}</span>
 
             <span className="block text-slate-100 whitespace-pre-wrap">{post.text}</span>
 
@@ -147,6 +188,21 @@ export default function PostItem({ post, username, onUpdate, onReplyClick }: Pro
             {liked ? '❄️' : '🔥'}
 
           </button>
+
+          {post.author === username && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleToggleLock(e);
+              }}
+              className={locked ? 'text-emerald-400 hover:text-emerald-300 text-lg' : 'text-slate-400 hover:text-slate-200 text-lg'}
+              aria-label={locked ? 'Unlock post' : 'Lock post'}
+            >
+              {locked ? '🔒' : '🔓'}
+            </button>
+          )}
 
         </div>
 
