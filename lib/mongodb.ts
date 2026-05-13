@@ -7,7 +7,7 @@ declare global {
   };
 }
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongo:ByiYAabGFyOPvQqLOjtFiypxqnMTCQRR@mongodb.railway.internal:27017/whspr';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
