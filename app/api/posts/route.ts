@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     }
 
-    const posts = await Post.find(query)
+    let posts = await Post.find(query)
       .populate({
         path: 'replies',
         populate: {
@@ -64,6 +64,19 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+
+    if (posts.length === 0 && (lon !== 0 || lat !== 0)) {
+      posts = await Post.find({ locked: { $ne: true } })
+        .populate({
+          path: 'replies',
+          populate: {
+            path: 'replies',
+            populate: {
+              path: 'replies',
+            },
+          },
+        });
+    }
 
     console.log('API: Found posts:', posts.length, 'with query:', JSON.stringify(query));
 
