@@ -36,21 +36,17 @@ export async function GET(request: NextRequest) {
 
     const lat = parseFloat(searchParams.get('lat') || '0');
 
-    let query = {};
+    let query: any = { locked: { $ne: true } };
 
     if (lon !== 0 || lat !== 0) {
 
-      query = {
+      query.location = {
 
-        location: {
+        $near: {
 
-          $near: {
+          $geometry: { type: 'Point', coordinates: [lon, lat] },
 
-            $geometry: { type: 'Point', coordinates: [lon, lat] },
-
-            $maxDistance: 5000000 // 5000km
-
-          }
+          $maxDistance: 5000000 // 5000km
 
         }
 
@@ -68,6 +64,8 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+
+    console.log('API: Found posts:', posts.length, 'with query:', JSON.stringify(query));
 
     // Calculate points for each post: replies = 2 points, likes = 1 point, only from last 4 hours
 
