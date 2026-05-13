@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['whspr.site'],
+  // Remove allowedDevOrigins for production deployment
 };
 
 export default nextConfig;
