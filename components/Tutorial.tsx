@@ -12,13 +12,13 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         
         {/* Browse Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-slate-200">Browse what's around you</h3>
+          <h3 className="text-lg font-semibold mb-4 text-slate-200">Where thought turns into action</h3>
           <div className="space-y-3">
             <div className="flex gap-4 items-start">
               <div className="text-3xl flex-shrink-0">🔥</div>
               <div>
                 <p className="font-medium">Choose what's hot</p>
-                <p className="text-sm text-slate-400">Discover trending posts in your area</p>
+                <p className="text-sm text-slate-400">So that other users can see it</p>
               </div>
             </div>
             
@@ -26,7 +26,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
               <div className="text-3xl flex-shrink-0">❄️</div>
               <div>
                 <p className="font-medium">Or change your mind</p>
-                <p className="text-sm text-slate-400">Explore cooler, older conversations</p>
+                <p className="text-sm text-slate-400">And decide a topic is no longer relevant</p>
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
             <div className="text-3xl flex-shrink-0">🔒</div>
             <div>
               <p className="font-medium">Keep conversations alive</p>
-              <p className="text-sm text-slate-400">Your posts are deleted when you leave, unless you decide otherwise—lock them to keep other people's minds busy</p>
+              <p className="text-sm text-slate-400">Your posts are deleted when you leave, unless you decide otherwise—lock them an they keep other people's minds busy</p>
             </div>
           </div>
         </div>

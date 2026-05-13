@@ -161,7 +161,7 @@ export default function PostItem({ post, username, onUpdate, onReplyClick }: Pro
 
           >
 
-            ↩️
+            💭
 
           </button>
 

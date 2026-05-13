@@ -60,7 +60,7 @@ export default function UsernameForm({ onSet, error }: Props) {
 
         </div>
 
-        <h2 className="text-xl mb-4 text-center">Enter your username</h2>
+        <h2 className="text-xl mb-4 text-center italic">Where thought turns into action</h2>
 
         {localError && <p className="text-red-500 mb-4 text-center">{localError}</p>}
 
@@ -84,7 +84,7 @@ export default function UsernameForm({ onSet, error }: Props) {
 
         <button onClick={handleSubmit} onTouchStart={handleSubmit} className="bg-blue-500 text-white p-4 rounded-3xl w-full hover:bg-blue-600 transition mb-4">Enter</button>
 
-        <p className="text-xs text-slate-400 italic text-center">We need access to your location for post recommendation <span className="font-semibold">*only*</span>, we have a strict <span className="font-semibold">*no logs*</span> policy</p>
+        <p className="text-xs text-slate-400 italic text-center">We need access to your location for <span className="font-semibold">post recommendation only</span>, we have a strict <span className="font-semibold">no logs policy</span></p>
 
       </div>
 
