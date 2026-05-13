@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "whspr",
   description: "whspr — a lightweight local social feed",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
